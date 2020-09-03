@@ -8,7 +8,7 @@ $("#create-room").click(function () {
   $("#op3").show();
 });
 $("#create-btn").click(function () {
-  let name = $("#create-name").val();
+  let name = $("#name-create").val();
   socket.emit("user-create-room", name);
 });
 $("#join-room").click(function () {
@@ -27,4 +27,10 @@ $(".close").click(function () {
   $("#op1").show();
   $("#op2").hide();
   $("#op3").hide();
+});
+socket.on("cant-find-room", () => {
+  alert("Can't find room !!!");
+});
+socket.on("username-taken", () => {
+  alert("Name taken !!!");
 });

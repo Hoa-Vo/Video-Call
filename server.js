@@ -29,7 +29,7 @@ class room {
   }
 }
 let roomList = [];
-let usn;
+let usn, currentId;
 app.use("/peerjs", peerServer);
 
 app.use(express.static("public"));
@@ -48,33 +48,65 @@ app.get("/:room", (req, res) => {
 
 io.on("connection", socket => {
   socket.on("join-room", (roomID, userID) => {
-    console.log(socket.id);
     socket.join(roomID);
     socket.usn = usn;
-    io.to(roomID).emit("user-join-room", userID, usn);
+    socket.roomID = currentId;
+    io.to(roomID).emit("user-join-room", userID);
     socket.on("message", message => {
       io.to(roomID).emit("createMessage", message, socket.usn);
     });
+    socket.on("user-leave-room", roomID => {
+      socket.leave(roomID);
+      let idx = myModule.findRoomIndex(roomList, roomID);
+      if (idx != -1) {
+        let count = myModule.countUserInRoom(roomList, idx);
+        if (count === 1) {
+          roomList.splice(roomList[idx], 1);
+        } else {
+          roomList[idx].delUser(socket.usn);
+        }
+        socket.to(roomID).broadcast.emit("user-disconnected", userID);
+      }
+    });
+    socket.on("disconnect", () => {
+      let idx = myModule.findRoomIndex(roomList, socket.roomID);
+      if (idx != -1) {
+        let count = myModule.countUserInRoom(roomList, idx);
+        if (count === 1) {
+          roomList.splice(roomList[idx], 1);
+        } else {
+          roomList[idx].delUser(socket.usn);
+        }
+        socket.to(roomID).broadcast.emit("user-disconnected", userID);
+      }
+    });
   });
   socket.on("user-create-room", name => {
-    console.log(socket.id);
     let id = uuidv4();
     let myRoom = new room(id);
     let myUser = new user(name);
     myRoom.addUser(myUser);
     roomList.push(myRoom);
     usn = name;
+    currentId = id;
     socket.emit("send-id", id, name);
   });
   socket.on("new-user-join-room", (roomID, name) => {
     if (myModule.findRoom(roomList, roomID)) {
       let idx = myModule.findRoomIndex(roomList, roomID);
-      let myUser = new user(name);
-      roomList[idx].addUser(myUser);
-      usn = name;
-      socket.emit("send-id", roomID);
+      if (myModule.checkUserName(roomList, idx, name)) {
+        let myUser = new user(name);
+        roomList[idx].addUser(myUser);
+        usn = name;
+        currentId = roomID;
+        socket.emit("send-id", roomID);
+      } else {
+        socket.emit("username-taken");
+      }
     } else {
+      socket.emit("cant-find-room", roomID);
     }
   });
 });
+
 server.listen(process.env.PORT || 3000);

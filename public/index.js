@@ -6,6 +6,7 @@ const myPeer = new Peer(undefined, {
   port: "3000",
 });
 const socket = io("/");
+const peers = {};
 let myVideoStream;
 navigator.mediaDevices
   .getUserMedia({
@@ -22,7 +23,7 @@ navigator.mediaDevices
         addVideoStream(video, userVideoStream);
       });
     });
-    socket.on("user-join-room", (userID, usn) => {
+    socket.on("user-join-room", userID => {
       connectToNewUser(userID, stream);
     });
   });
@@ -40,7 +41,12 @@ function connectToNewUser(userID, stream) {
   call.on("close", () => {
     video.remove();
   });
+  peers[userID] = call;
 }
+
+socket.on("user-disconnected", userID => {
+  if (peers[userID]) peers[userID].close();
+});
 
 function addVideoStream(video, stream) {
   video.srcObject = stream;
@@ -122,3 +128,7 @@ const setPlayVideo = () => {
   `;
   document.querySelector(".main__video_button").innerHTML = html;
 };
+$(".leave_meeting").click(function () {
+  socket.emit("user-leave-room", roomId);
+  window.location.href = "/";
+});
