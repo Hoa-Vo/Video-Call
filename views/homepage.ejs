@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=<device-width>, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/491c609996.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="homestyle.css" />
+  </head>
+  <body>
+    <div id="parent-menu">
+      <div class="main-menu" id="op1">
+        <i class="fas fa-camera"></i>
+        <button id="create-room">Create Room</button>
+        <button id="join-room">Join Room</button>
+      </div>
+      <div class="main-menu" id="op2">
+        <input id="room-id" type="text" placeholder="room id" required />
+        <input id="name" type="text" placeholder="name" required />
+        <button class="btn" id="join-btn">Join</button>
+        <button class="close">Close</button>
+      </div>
+      <div class="main-menu" id="op3">
+        <input id="name-create" type="text" placeholder="name" required />
+        <button class="btn" id="create-btn">Create</button>
+        <button class="close">Close</button>
+      </div>
+    </div>
+  </body>
+  <script src="login.js"></script>
+</html>
