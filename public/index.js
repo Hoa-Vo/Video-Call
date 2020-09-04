@@ -132,3 +132,6 @@ $(".leave_meeting").click(function () {
   socket.emit("user-leave-room", roomId);
   window.location.href = "/";
 });
+const showInfo = () => {
+  alert("Your room id: " + roomId);
+};
