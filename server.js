@@ -2,7 +2,6 @@ const express = require("express");
 const app = express();
 const server = require("http").Server(app);
 const { v4: uuidv4 } = require("uuid");
-const { statSync } = require("fs");
 const { static } = require("express");
 const io = require("socket.io")(server);
 const { ExpressPeerServer } = require("peer");
@@ -53,6 +52,7 @@ io.on("connection", socket => {
     socket.roomID = currentId;
     io.to(roomID).emit("user-join-room", userID);
     socket.on("message", message => {
+      console.log("ok");
       io.to(roomID).emit("createMessage", message, socket.usn);
     });
     socket.on("user-leave-room", roomID => {

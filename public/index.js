@@ -3,11 +3,12 @@ const videoGrid = document.getElementById("video-grid");
 const myPeer = new Peer(undefined, {
   path: "/peerjs",
   host: "/",
-  port: "3000",
+  port: "443",
 });
 const socket = io("/");
 const peers = {};
 let myVideoStream;
+console.log("setup");
 navigator.mediaDevices
   .getUserMedia({
     video: true,
@@ -60,11 +61,13 @@ let text = $("input");
 
 $("html").keydown(function (e) {
   if (e.which == 13 && text.val().length !== 0) {
+    console.log("send");
     socket.emit("message", text.val());
     text.val("");
   }
 });
 socket.on("createMessage", (message, name) => {
+  console.log("recive");
   $("ul").append(`<li class="message"><b>${name}</b><br/>${message}</li>`);
   scrollToBottom();
 });
